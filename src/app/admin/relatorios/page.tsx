@@ -69,7 +69,7 @@ export default async function RelatoriosPage() {
                     <td className="p-4">{diagnostico.score ?? "-"}</td>
                     <td className="p-4 whitespace-nowrap space-x-4">
                       <Link
-                        href={`/admin/empresas/${empresa?.id ?? ""}`}
+                        href={`/admin/relatorios/${diagnostico.id}`}
                         className="text-primary hover:underline"
                       >
                         Ver relatório →
