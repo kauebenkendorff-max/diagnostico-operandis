@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, Building2, FileBarChart, LogOut } from "lucide-react";
+import { LayoutDashboard, Building2, FileBarChart, LogOut, ShieldCheck } from "lucide-react";
 
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -12,8 +12,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen flex bg-secondary/20">
       <aside className="w-64 border-r border-border bg-card flex flex-col p-6 gap-8">
         <div className="flex items-center gap-2">
-          <div className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-semibold">
-            O
+          <div className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center">
+            <ShieldCheck className="h-5 w-5" strokeWidth={2} />
           </div>
           <span className="font-semibold">Operandis</span>
         </div>
