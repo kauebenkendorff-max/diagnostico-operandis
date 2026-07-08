@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ShieldCheck } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,8 +39,8 @@ export default function LoginPage() {
     <main className="min-h-screen flex items-center justify-center bg-secondary/30 px-6">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto h-12 w-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-semibold mb-2">
-            O
+          <div className="mx-auto h-12 w-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center mb-2">
+            <ShieldCheck className="h-6 w-6" strokeWidth={2} />
           </div>
           <CardTitle>Painel Operandis</CardTitle>
           <CardDescription>Acesso restrito à equipe</CardDescription>
