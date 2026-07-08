@@ -48,7 +48,25 @@ export default function GrupoPage() {
 
   const categoriaAtual = categorias[numero - 1];
 
+  function respostaVazia(resp?: { option_id?: string; texto?: string; nota?: number }) {
+    if (!resp) return true;
+    const { option_id, texto, nota } = resp;
+    return !option_id && !texto?.trim() && nota === undefined;
+  }
+
   async function salvarEAvancar() {
+    const pendentes = perguntas.filter(
+      (p) => p.obrigatoria && respostaVazia(respostas[p.id])
+    );
+    if (pendentes.length > 0) {
+      alert(
+        `Responda as perguntas obrigatórias antes de continuar:\n\n${pendentes
+          .map((p) => `• ${p.titulo}`)
+          .join("\n")}`
+      );
+      return;
+    }
+
     const supabase = createClient();
     const linhas = Object.entries(respostas).map(([question_id, resp]) => ({
       diagnostic_id: params.diagnosticoId,
