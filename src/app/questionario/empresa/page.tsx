@@ -72,24 +72,16 @@ export default function EmpresaPage() {
   async function onSubmit(values: CompanyFormValues) {
     const supabase = createClient();
 
-    const { data: company, error } = await supabase
-      .from("companies")
-      .insert(values)
-      .select()
-      .single();
+    const { data: diagnosticoId, error } = await supabase.rpc("iniciar_diagnostico", {
+      empresa: values,
+    });
 
-    if (error || !company) {
+    if (error || !diagnosticoId) {
       alert("Erro ao salvar a empresa. Tente novamente.");
       return;
     }
 
-    const { data: diagnostic } = await supabase
-      .from("diagnostics")
-      .insert({ company_id: company.id, status: "em_andamento" })
-      .select()
-      .single();
-
-    router.push(`/questionario/${diagnostic?.id ?? ""}/grupo/1`);
+    router.push(`/questionario/${diagnosticoId}/grupo/1`);
   }
 
   return (
