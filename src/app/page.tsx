@@ -13,8 +13,8 @@ export default function LandingPage() {
     <main className="min-h-screen flex flex-col items-center justify-center px-6 py-24 bg-gradient-to-b from-white to-secondary/40">
       <div className="w-full max-w-3xl text-center space-y-8 animate-fade-in">
         <div className="flex justify-center">
-          <div className="h-16 w-16 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center text-2xl font-semibold shadow-lg shadow-primary/20">
-            O
+          <div className="h-16 w-16 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/20">
+            <ShieldCheck className="h-9 w-9" strokeWidth={2} />
           </div>
         </div>
 
