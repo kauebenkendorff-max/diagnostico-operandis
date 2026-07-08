@@ -74,10 +74,21 @@ export default function GrupoPage() {
       ...resp,
     }));
     if (linhas.length > 0) {
-      await supabase.from("answers").upsert(linhas, { onConflict: "diagnostic_id,question_id" });
+      const { error } = await supabase
+        .from("answers")
+        .upsert(linhas, { onConflict: "diagnostic_id,question_id" });
+
+      if (error) {
+        alert("Erro ao salvar as respostas. Tente novamente.");
+        return;
+      }
     }
 
     if (numero >= totalGrupos) {
+      await supabase
+        .from("diagnostics")
+        .update({ status: "finalizado", fim: new Date().toISOString() })
+        .eq("id", params.diagnosticoId);
       router.push(`/questionario/${params.diagnosticoId}/revisao`);
     } else {
       router.push(`/questionario/${params.diagnosticoId}/grupo/${numero + 1}`);
