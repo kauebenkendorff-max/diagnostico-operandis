@@ -38,10 +38,31 @@ export default function GrupoPage() {
           .order("ordem", { ascending: true });
         setPerguntas(qs ?? []);
       }
+
+      // Reidrata as respostas já salvas deste diagnóstico, para que
+      // "Voltar", "Voltar e revisar" e um refresh mostrem o que já
+      // foi preenchido, sem reiniciar o formulário.
+      const { data: salvas } = await supabase
+        .from("answers")
+        .select("question_id, option_id, texto, nota")
+        .eq("diagnostic_id", params.diagnosticoId);
+
+      if (salvas && salvas.length > 0) {
+        const mapa: Record<string, { option_id?: string; texto?: string; nota?: number }> = {};
+        for (const a of salvas) {
+          mapa[a.question_id] = {
+            ...(a.option_id ? { option_id: a.option_id } : {}),
+            ...(a.texto != null ? { texto: a.texto } : {}),
+            ...(a.nota != null ? { nota: a.nota } : {}),
+          };
+        }
+        setRespostas(mapa);
+      }
+
       setCarregando(false);
     }
     carregar();
-  }, [numero]);
+  }, [numero, params.diagnosticoId]);
 
   const totalGrupos = categorias.length || 1;
   const progresso = Math.round((numero / (totalGrupos + 1)) * 100); // +1 = etapa de revisão
@@ -52,6 +73,17 @@ export default function GrupoPage() {
     if (!resp) return true;
     const { option_id, texto, nota } = resp;
     return !option_id && !texto?.trim() && nota === undefined;
+  }
+
+  // Monta as linhas de resposta apenas das perguntas do grupo atual.
+  function linhasDoGrupo() {
+    return perguntas
+      .filter((p) => !respostaVazia(respostas[p.id]))
+      .map((p) => ({
+        diagnostic_id: params.diagnosticoId,
+        question_id: p.id,
+        ...respostas[p.id],
+      }));
   }
 
   async function salvarEAvancar() {
@@ -68,11 +100,7 @@ export default function GrupoPage() {
     }
 
     const supabase = createClient();
-    const linhas = Object.entries(respostas).map(([question_id, resp]) => ({
-      diagnostic_id: params.diagnosticoId,
-      question_id,
-      ...resp,
-    }));
+    const linhas = linhasDoGrupo();
     if (linhas.length > 0) {
       const { error } = await supabase
         .from("answers")
@@ -93,6 +121,21 @@ export default function GrupoPage() {
     } else {
       router.push(`/questionario/${params.diagnosticoId}/grupo/${numero + 1}`);
     }
+  }
+
+  // Salva o que já foi preenchido (sem exigir obrigatórias) antes de
+  // voltar, para não perder nada ao navegar para trás.
+  async function voltar() {
+    const supabase = createClient();
+    const linhas = linhasDoGrupo();
+    if (linhas.length > 0) {
+      await supabase
+        .from("answers")
+        .upsert(linhas, { onConflict: "diagnostic_id,question_id" });
+    }
+    router.push(
+      numero > 1 ? `/questionario/${params.diagnosticoId}/grupo/${numero - 1}` : "/"
+    );
   }
 
   if (carregando) {
@@ -146,10 +189,7 @@ export default function GrupoPage() {
         </motion.div>
 
         <div className="flex justify-between pt-4">
-          <Button
-            variant="outline"
-            onClick={() => router.push(numero > 1 ? `/questionario/${params.diagnosticoId}/grupo/${numero - 1}` : "/")}
-          >
+          <Button variant="outline" onClick={voltar}>
             Voltar
           </Button>
           <Button onClick={salvarEAvancar}>
